@@ -48,8 +48,8 @@ def get_drinks():
 '''
 
 
-@requires_auth(permission='get:drinks-detail')
 @app.route('/drinks-detail')
+@requires_auth(permission='get:drinks-detail')
 def get_drinks_detail():
     drinks = [drink.long() for drink in Drink.query.all()]
 
@@ -69,9 +69,8 @@ def get_drinks_detail():
 '''
 
 
-@requires_auth(permission='post:drinks')
-@app.route('/drinks')
 @app.route('/drinks', methods=['POST'])
+@requires_auth(permission='post:drinks')
 def post_drinks():
     try:
         body = request.get_json()
@@ -107,8 +106,8 @@ def post_drinks():
 '''
 
 
-@requires_auth(permission='patch:drinks')
 @app.route('/drinks/<int:id>', methods=['PATCH'])
+@requires_auth(permission='patch:drinks')
 def patch_drinks(id):
     drink = Drink.query.filter_by(id=id).one_or_none()
     if drink is None:
@@ -124,7 +123,7 @@ def patch_drinks(id):
 
     return jsonify({
         'success': True,
-        'drinks': drink}), 200
+        'drinks': [drink.long()]}), 200
 
 
 '''
@@ -139,8 +138,8 @@ def patch_drinks(id):
 '''
 
 
-@requires_auth(permission='delete:drinks')
 @app.route('/drinks/<int:id>', methods=['DELETE'])
+@requires_auth(permission='delete:drinks')
 def delete_drinks(id):
     drink = Drink.query.filter_by(id=id).one_or_none()
     if drink is None:
@@ -207,3 +206,12 @@ def already_exist(error):
 @TODO implement error handler for AuthError
     error handler should conform to general task above 
 '''
+
+
+@app.errorhandler(AuthError)
+def already_exist(error):
+    return jsonify({
+        "success": False,
+        "error": error.status_code,
+        "message": error.error['description']
+    }), error.status_code
