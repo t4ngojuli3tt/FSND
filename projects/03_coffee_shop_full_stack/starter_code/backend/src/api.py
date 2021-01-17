@@ -9,7 +9,7 @@ from .auth.auth import AuthError, requires_auth
 
 app = Flask(__name__)
 setup_db(app)
-# CORS(app)
+CORS(app)
 
 '''
 @TODO uncomment the following line to initialize the datbase
@@ -48,6 +48,7 @@ def get_drinks():
 '''
 
 
+@requires_auth(permission='get:drinks-detail')
 @app.route('/drinks-detail')
 def get_drinks_detail():
     drinks = [drink.long() for drink in Drink.query.all()]
@@ -68,6 +69,8 @@ def get_drinks_detail():
 '''
 
 
+@requires_auth(permission='post:drinks')
+@app.route('/drinks')
 @app.route('/drinks', methods=['POST'])
 def post_drinks():
     try:
@@ -104,6 +107,7 @@ def post_drinks():
 '''
 
 
+@requires_auth(permission='patch:drinks')
 @app.route('/drinks/<int:id>', methods=['PATCH'])
 def patch_drinks(id):
     drink = Drink.query.filter_by(id=id).one_or_none()
@@ -135,6 +139,7 @@ def patch_drinks(id):
 '''
 
 
+@requires_auth(permission='delete:drinks')
 @app.route('/drinks/<int:id>', methods=['DELETE'])
 def delete_drinks(id):
     drink = Drink.query.filter_by(id=id).one_or_none()
@@ -173,7 +178,6 @@ def unprocessable(error):
                     }), 404
 
 '''
-
 
 '''
 @TODO implement error handler for 404
